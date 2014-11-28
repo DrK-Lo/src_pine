@@ -1,0 +1,99 @@
+On hulk, the 80% non-imputed data was run for 100,000 iterations of the MCMC
+hulk:/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2
+
+### First: run bayenv2 for covariance matrices
+	bayenv2_pine_makeCovAllPops.txt
+
+### Next edit the covariance matrices from Bayenv2 on hulk
+	source("CallEdCovMatPine.R")
+	### download the edited matrix to AdaptreeData/pine/envishortlistCovMats on laptop
+
+### Line up populations, make environment and edited covariance-matrix files
+	### in folder AdaptreeData/pine/envishortlistCovMats
+	source("src/MakeEnviBayenv.R")
+
+### Transfer edited environment files and cov-mat from laptop to Bugaboo
+### Transfer SNP list from hulk to Bugaboo
+### Folder on bugaboo is called PineBayenv2_10nonimputed
+
+### Run SNPs: write file minus populations that were removed; remove SNP file after run is over
+
+10141833 SNPs
+SNP file: var_out_pine_all_COMBINED.table.contig_flt10.bayenv
+SNP namefile: var_out_pine_all_COMBINED.table.contig_flt10.bayenv.loci
+Covmat file (edited for pops with missing envi): var_out_pine_all_COMBINED.table.contig_flt10.bayenv.envi.finalcovmatED
+Envi file: var_out_pine_all_COMBINED.table.contig_flt10.bayenv.envi
+Pop file (edited for pops with missing envi): var_out_pine_all_COMBINED.table.contig_flt10.bayenv.envi.finalPops
+MissingPopsFile: var_out_pine_all_COMBINED.table.contig_flt10.bayenv.envi.linesRemoved
+Envi names: 
+
+
+### Concaconate all output from bayenv2 on bugaboo SEQCAP
+ klott@bugaboo go to /PineBayenv2_10nonimputed_rm580plus
+	mkdir SubmitScripts
+	mv SubmitBay* SubmitScripts/
+	cat *.xtx > Pine_SeqCap.XTX
+	head *.XTX
+	cat *.bf > Pine_SeqCap.BF
+	head *.BF
+	mkdir BF
+	mv *.bf BF/
+	mkdir XTX
+	mv *.xtx XTX/
+	wc -l *.XTX
+	wc -l *.BF
+	paste Pine_SeqCap.XTX Pine_SeqCap.BF > Pine_SeqCap.XTX.BF
+	wc -l var_out_pine_all_COMBINED.table.contig_flt10.bayenv.loci
+	scp Pine_SeqCap.XTX.BF klott@hulk.zoology.ubc.ca:/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus
+
+## on laptop
+	in R: CalcEnviClusters.R 
+transfer var_out_pine_all_COMBINED.table.contig_flt10.bayenv.envi2.clusters to hulk
+
+### On hulk: Calculate MAF
+function_CalcMAF.R
+	#/var_out_pine_all_COMBINED.table.contig_flt10.bayenv.MAF
+	#/pine_GBS_all.table.contig_flt10.bayenv.MAF
+
+### Pine seqcap in R
+  wkdir <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus"
+	locinames <- "/data/seqcap/pine/bwa_pseudo/final_tables/var_out_pine_all_COMBINED.table.contig_flt10.bayenv.loci"
+	XTX.BF <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus/Pine_SeqCap.XTX.BF"
+	MAF <- "/data/seqcap/pine/bwa_pseudo/final_tables/var_out_pine_all_COMBINED.table.contig_flt10.bayenv.MAF"
+	envi <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus/enviNamesAllAnalyses.txt"
+  source("ProcessBFXTX1_MakeMasterListBayenv2.R")
+
+
+### Pine seqcap multivariate stats
+	ProcessBFXTX_CalcDPine.R
+
+
+### Concaconate all output from bayenv2 on bugaboo GBS
+ klott@bugaboo go to /PineBayenv2_GBS
+	mkdir SubmitScripts
+	mv SubmitBay* SubmitScripts/
+	cat *.xtx > Pine_GBS.XTX
+	head *.XTX
+	cat *.bf > Pine_GBS.BF
+	head *.BF
+	mkdir BF
+	mv *.bf BF/
+	mkdir XTX
+	mv *.xtx XTX/
+	wc -l *.XTX
+	wc -l *.BF
+	paste Pine_GBS.XTX Pine_GBS.BF > Pine_GBS.XTX.BF
+	scp Pine_GBS.XTX.BF klott@hulk.zoology.ubc.ca:/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus
+
+### Pine GBS in R
+  wkdir <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus"
+	locinames <- "/data/seqcap/pine/bwa_pseudo/final_tables/pine_GBS_all.table.contig_flt10.bayenv.loci"
+	XTX.BF <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus/Pine_GBS.XTX.BF"
+	MAF <- "/data/seqcap/pine/bwa_pseudo/final_tables/pine_GBS_all.table.contig_flt10.bayenv.MAF"
+	envi <- "/data/seqcap/pine/bwa_pseudo/final_tables/bayenv2Results10nonimputed_rm580plus/enviNamesAllAnalyses.txt"
+  source("ProcessBFXTX1_MakeMasterListBayenv2.R")
+
+### Pine GBS multivariate stats
+	ProcessBFXTX_CalcDPine.R
+
+
